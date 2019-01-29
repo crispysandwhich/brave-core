@@ -1,7 +1,7 @@
 {
   "name": "bat_ads",
   "display_name": "Bat Ads Service",
-  "sandbox_type": "utility",
+  "sandbox_type": "none",
   "options" : {
     "instance_sharing" : "shared_instance_across_users"
   },

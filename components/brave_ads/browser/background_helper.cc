@@ -32,7 +32,7 @@ void BackgroundHelper::RemoveObserver(Observer* observer) {
   observers_.RemoveObserver(observer);
 }
 
-#if !defined(OS_MACOSX) && !defined(OS_WIN)
+#if !defined(OS_MACOSX) && !defined(OS_WIN) && !defined(OS_LINUX)
 BackgroundHelper* BackgroundHelper::GetInstance() {
   // just return a dummy background helper for all other platforms
   return base::Singleton<BackgroundHelper>::get();

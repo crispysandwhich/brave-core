@@ -5,8 +5,10 @@
 
 #include <algorithm>
 #include <ctime>
-#include <sstream>
 #include <map>
+#include <memory>
+#include <sstream>
+#include <utility>
 
 #include "bat/ledger/internal/bat_client.h"
 #include "bat/ledger/internal/bat_helper.h"
@@ -101,7 +103,7 @@ void BatClient::requestCredentialsCallback(
   std::string label = ledger_->GenerateGUID();
   std::string publicKeyHex = braveledger_bat_helper::uint8ToHex(publicKey);
   std::string keys[3] = {"currency", "label", "publicKey"};
-  std::string values[3] = {CURRENCY, label, publicKeyHex};
+  std::string values[3] = {LEDGER_CURRENCY, label, publicKeyHex};
   std::string octets = braveledger_bat_helper::stringify(keys, values, 3);
   std::string headerDigest = "SHA-256=" +
       braveledger_bat_helper::getBase64(
@@ -117,7 +119,7 @@ void BatClient::requestCredentialsCallback(
   braveledger_bat_helper::REQUEST_CREDENTIALS_ST requestCredentials;
   requestCredentials.requestType_ = "httpSignature";
   requestCredentials.proof_ = proof;
-  requestCredentials.request_body_currency_ = CURRENCY;
+  requestCredentials.request_body_currency_ = LEDGER_CURRENCY;
   requestCredentials.request_body_label_ = label;
   requestCredentials.request_body_publicKey_ = publicKeyHex;
   requestCredentials.request_headers_digest_ = headerDigest;

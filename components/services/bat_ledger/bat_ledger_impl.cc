@@ -214,7 +214,8 @@ void BatLedgerImpl::OnGetExcludedPublishersNumber(
   delete holder;
 }
 
-void BatLedgerImpl::GetExcludedPublishersNumber(GetExcludedPublishersNumberCallback callback) {
+void BatLedgerImpl::GetExcludedPublishersNumber(
+    GetExcludedPublishersNumberCallback callback) {
   // delete in OnGetExcludedPublishersNumber
   auto* holder = new CallbackHolder<GetExcludedPublishersNumberCallback>(
       AsWeakPtr(), std::move(callback));

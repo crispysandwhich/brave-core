@@ -196,6 +196,7 @@ class RewardsServiceImpl : public RewardsService,
 
   // Testing methods
   void SetLedgerEnvForTesting();
+  void StartAutoContributeForTest();
 
  private:
   friend class RewardsServiceTest;

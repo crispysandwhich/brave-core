@@ -437,6 +437,7 @@ class LedgerImpl : public ledger::Ledger,
 
   scoped_refptr<base::SequencedTaskRunner> GetTaskRunner();
   void GetRewardsInternalsInfo(ledger::RewardsInternalsInfo* info) override;
+  void StartAutoContribute() override;
 
  private:
   void AddRecurringPayment(const std::string& publisher_id,

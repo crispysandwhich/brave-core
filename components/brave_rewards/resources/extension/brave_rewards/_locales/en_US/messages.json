@@ -384,5 +384,9 @@
   "contributionTips": {
     "message": "Contributions & Tips",
     "description": "Title for monthly tips processed notification"
+  },
+  "bat": {
+    "message": "BAT",
+    "description": "BAT text for displaying converted donation amount."
   }
 }

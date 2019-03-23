@@ -8,6 +8,8 @@
 
 #include "components/content_settings/core/browser/cookie_settings.h"
 
+class HostContentSettingsMap;
+
 namespace content_settings {
 
 class BraveCookieSettings : public CookieSettings {
@@ -27,9 +29,21 @@ class BraveCookieSettings : public CookieSettings {
                         const GURL& tab_url,
                         content_settings::SettingSource* source,
                         ContentSetting* cookie_setting) const;
+
   bool IsCookieAccessAllowed(const GURL& url,
                              const GURL& first_party_url,
                              const GURL& tab_url) const;
+
+  bool IsCookieAccessAllowed(const GURL& url,
+                             const GURL& first_party_url) const;
+
+  bool IsCookieAccessAllowed(HostContentSettingsMap* map,
+                             int render_process_id,
+                             int render_frame_id,
+                             const GURL& url,
+                             const GURL& first_party_url,
+                             const GURL& tab_url) const;
+
   bool GetAllowGoogleAuth() const {
     return allow_google_auth_;
   }

@@ -15,16 +15,19 @@
 #include <string>
 #include <vector>
 
+#include "base/containers/flat_set.h"
 #include "base/files/file_path.h"
 #include "base/memory/weak_ptr.h"
 #include "base/sequence_checker.h"
 #include "base/sequenced_task_runner.h"
 #include "brave/components/brave_shields/browser/base_local_data_files_observer.h"
+#include "brave/components/brave_shields/browser/buildflags/buildflags.h"  // For STP
 #include "brave/components/brave_shields/browser/dat_file_util.h"
 #include "content/public/common/resource_type.h"
 #include "url/gurl.h"
 
 class CTPParser;
+class HostContentSettingsMap;
 class TrackingProtectionServiceTest;
 
 namespace brave_shields {
@@ -47,10 +50,50 @@ class TrackingProtectionService : public BaseLocalDataFilesObserver {
                         const base::FilePath& install_dir,
                         const std::string& manifest) override;
 
+#if BUILDFLAG(BRAVE_STP_ENABLED)
+  bool ShouldStoreState(HostContentSettingsMap* map,
+                        int render_process_id,
+                        int render_frame_id,
+                        const GURL& top_origin_url,
+                        const GURL& origin_url);
+
+  void SetStartingSiteForRenderFrame(GURL starting_site, int render_process_id,
+    int render_frame_id);
+  GURL GetStartingSiteForRenderFrame(int render_process_id,
+    int render_frame_id);
+  void DeleteRenderFrameKey(int render_process_id, int render_frame_id);
+  void ModifyRenderFrameKey(int old_render_process_id,
+                            int old_render_frame_id,
+                            int new_render_process_id,
+                            int new_render_frame_id);
+#endif
+
+ protected:
+#if BUILDFLAG(BRAVE_STP_ENABLED)
+  void ParseStorageTrackersData();
+  struct RenderFrameIdKey {
+    RenderFrameIdKey();
+    RenderFrameIdKey(int render_process_id, int frame_routing_id);
+
+    int render_process_id;
+    int frame_routing_id;
+
+    bool operator<(const RenderFrameIdKey& other) const;
+    bool operator==(const RenderFrameIdKey& other) const;
+  };
+#endif
+
  private:
   void OnDATFileDataReady();
   std::vector<std::string> GetThirdPartyHosts(const std::string& base_host);
 
+#if BUILDFLAG(BRAVE_STP_ENABLED)
+  base::flat_set<std::string> first_party_storage_trackers_;
+  std::map<RenderFrameIdKey, GURL> render_frame_key_to_starting_site_url;
+  base::Lock frame_starting_site_map_lock_;
+
+  brave_shields::DATFileDataBuffer storage_trackers_buffer_;
+#endif
   brave_shields::DATFileDataBuffer buffer_;
 
   std::unique_ptr<CTPParser> tracking_protection_client_;

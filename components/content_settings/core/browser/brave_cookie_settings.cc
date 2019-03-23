@@ -6,6 +6,9 @@
 #include "brave/components/content_settings/core/browser/brave_cookie_settings.h"
 
 #include "base/bind.h"
+#include "brave/browser/brave_browser_process_impl.h"
+#include "brave/components/brave_shields/browser/buildflags/buildflags.h"  // For STP
+#include "brave/components/brave_shields/browser/tracking_protection_service.h"
 #include "brave/components/brave_shields/common/brave_shield_constants.h"
 #include "brave/common/brave_cookie_blocking.h"
 #include "brave/common/pref_names.h"
@@ -99,6 +102,16 @@ void BraveCookieSettings::GetCookieSetting(const GURL& url,
   }
 }
 
+bool BraveCookieSettings::IsCookieAccessAllowed(
+    const GURL& url,
+    const GURL& first_party_url) const {
+  ContentSetting setting;
+  GetCookieSetting(url, first_party_url, nullptr, &setting);
+  DCHECK(IsValidSetting(setting));
+  return (setting == CONTENT_SETTING_ALLOW ||
+          setting == CONTENT_SETTING_SESSION_ONLY);
+}
+
 bool BraveCookieSettings::IsCookieAccessAllowed(const GURL& url,
                                                 const GURL& first_party_url,
                                                 const GURL& tab_url) const {
@@ -110,6 +123,29 @@ bool BraveCookieSettings::IsCookieAccessAllowed(const GURL& url,
          setting == CONTENT_SETTING_BLOCK);
   return setting == CONTENT_SETTING_ALLOW ||
          setting == CONTENT_SETTING_SESSION_ONLY;
+}
+
+bool BraveCookieSettings::IsCookieAccessAllowed(HostContentSettingsMap* map,
+                          int render_process_id,
+                          int render_frame_id,
+                          const GURL& url,
+                          const GURL& first_party_url,
+                          const GURL& tab_url) const {
+#if BUILDFLAG(BRAVE_STP_ENABLED)
+  bool allow = false;
+  allow = g_brave_browser_process->tracking_protection_service()->
+    ShouldStoreState(
+        map,
+        render_process_id,
+        render_frame_id,
+        url,
+        first_party_url);
+  if (!allow) {
+    return allow;
+  }
+#endif
+
+  return IsCookieAccessAllowed(url, first_party_url, tab_url);
 }
 
 void BraveCookieSettings::OnAllowGoogleAuthChanged() {

@@ -1,0 +1,79 @@
+<script>
+var indexedDBAvailable = false;
+var dbAvailable = false;
+
+var indexedDB = window.indexedDB;
+var open = indexedDB.open("stp", 1);
+
+open.onsuccess = function() {
+  indexedDBAvailable = true;;
+}
+
+open.onerror = function() {
+  indexedDBAvailable = false;
+}
+
+try {
+    var db = window.openDatabase("UserDetails", "1.0", "User Details", 10000);
+    db.transaction(populateDB, onDBError, onDBSuccess);
+
+    function populateDB(tx) {
+      tx.executeSql('DROP TABLE IF EXISTS DETAILS');
+      tx.executeSql('CREATE TABLE IF NOT EXISTS DETAILS (id unique, Name, Email)');
+    }
+
+    function onDBError(error) {
+      dbAvailable = false;
+    }
+
+    function onDBSuccess(msg) {
+      dbAvailable = true;
+    }
+} catch (e) {
+  dbAvailable = false;
+}
+
+try {
+  localStorage.setItem("stp", "stp");
+} catch (e) {
+  console.error(e);
+}
+
+try {
+  sessionStorage.setItem("stp", "stp");
+} catch (e) {
+  console.error(e);
+}
+
+document.cookie = "stp=stp";
+
+function IsCookieAvailable() {
+  return document.cookie.length != 0;
+}
+
+function IsLocalStorageAvailable() {
+  try {  
+    var stp = localStorage.getItem('stp') 
+    return stp.length != 0;
+  } catch (e) {
+    return false;
+  }
+}
+
+function IsSessionStorageAvailable() {
+  try {
+    var stp = sessionStorage.getItem('stp')
+    return stp.length != 0
+  } catch (e) {
+    return false;
+  }
+}
+
+function IsIndexedDBAvailable() {
+  return indexedDBAvailable;
+}
+
+function IsDBAvailable() {
+  return dbAvailable;  
+}
+</script>

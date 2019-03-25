@@ -38,7 +38,7 @@ export class Panel extends React.Component<Props, State> {
       publisherKey: null,
       newMonthlyAmount: null
     }
-    this.defaultDonationAmounts = [0, 1, 5, 10]
+    this.defaultDonationAmounts = [1, 5, 10]
   }
 
   get actions () {
@@ -340,9 +340,16 @@ export class Panel extends React.Component<Props, State> {
     }
   }
 
-  onContributionAmountChange = (publisherKey: string, newAmount: string) => {
+  onContributionAmountChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     let newMonthlyAmount: string
-    const newValue = parseInt(newAmount, 10)
+    const newValue = parseInt(event.target.value, 10)
+    const publisher: RewardsExtension.Publisher | undefined = this.getPublisher()
+
+    if (!publisher || !publisher.publisher_key) {
+      return
+    }
+
+    const publisherKey = publisher.publisher_key
 
     if (newValue === 0) {
       newMonthlyAmount = '0.0'
@@ -362,10 +369,14 @@ export class Panel extends React.Component<Props, State> {
     const { rates } = this.props.rewardsPanelData.walletProperties
 
     const publisherKey = publisher && publisher.publisher_key
+    const initialAmounts = (
+      !publisherKey ||
+      !donationAmounts ||
+      !donationAmounts[publisherKey] ||
+      donationAmounts[publisherKey].length === 0
+    ) ? this.defaultDonationAmounts : donationAmounts[publisherKey]
 
-    const amounts = (!publisherKey || !donationAmounts || !donationAmounts[publisherKey])
-      ? this.defaultDonationAmounts
-      : donationAmounts[publisherKey]
+    const amounts = [0, ...initialAmounts]
 
     return amounts.map((value: number) => {
       return {
@@ -468,7 +479,7 @@ export class Panel extends React.Component<Props, State> {
               attentionScore={(publisher.percentage || 0).toString()}
               onToggleTips={this.doNothing}
               donationAction={this.showDonateToSiteDetail}
-              onAmountChange={this.onContributionAmountChange.bind(this, publisher.publisher_key)}
+              onAmountChange={this.onContributionAmountChange}
               onIncludeInAuto={this.switchAutoContribute}
               showUnVerified={!publisher.verified}
               acEnabled={enabledAC}

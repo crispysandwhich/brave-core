@@ -287,6 +287,8 @@ ExtensionFunction::ResponseAction BraveRewardsSaveSettingFunction::Run() {
           std::stoi(params->value.c_str()));
     }
   }
+
+  return RespondNow(NoArguments());
 }
 
 BraveRewardsSaveRecurringDonationFunction::
@@ -317,7 +319,6 @@ BraveRewardsRemoveRecurringDonationFunction::
 
 ExtensionFunction::ResponseAction
   BraveRewardsRemoveRecurringDonationFunction::Run() {
-
   std::unique_ptr<brave_rewards::RemoveRecurringDonation::Params> params(
     brave_rewards::RemoveRecurringDonation::Params::Create(*args_));
 

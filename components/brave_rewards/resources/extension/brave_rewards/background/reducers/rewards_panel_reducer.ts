@@ -303,6 +303,7 @@ export const rewardsPanelReducer = (state: RewardsExtension.State | undefined, a
         state[key] = value
         chrome.braveRewards.saveSetting(key, value)
       }
+      break
     }
     case types.REMOVE_RECURRING_DONATION: {
       let publisherKey = payload.publisherKey
@@ -336,6 +337,9 @@ export const rewardsPanelReducer = (state: RewardsExtension.State | undefined, a
       }
 
       state = { ...state }
+      if (!state.donationAmounts) {
+        state.donationAmounts = {}
+      }
       state.donationAmounts[payload.banner.publisherKey] = payload.banner.amounts
       break
     }

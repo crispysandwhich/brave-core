@@ -63,17 +63,11 @@ declare namespace chrome.braveRewards {
   const onExcludedSitesChanged: {
     addListener: (callback: (properties: RewardsExtension.ExcludedSitesChanged) => void) => void
   }
-<<<<<<< HEAD
   const saveSetting: (key: string, value: string) => {}
-=======
-  const getRecurringDonations: (callback: (siteList: RewardsExtension.RecurringDonation) => void) => {}
+  const getRecurringDonations: (callback: (donations: RewardsExtension.RecurringDonation) => void) => {}
   const saveRecurringDonation: (publisherKey: string, newAmount: string) => {}
   const removeRecurringDonation: (publisherKey: string) => {}
-  const getPublisherDonationAmounts: (publisherKey: string) => {}
-  const onPublisherDonationAmounts: {
-    addListener: (callback: (amounts: number[]) => void) => void
-  }
->>>>>>> Fixes brave/brave-browser#2245
+  const getPublisherBanner: (publisherKey: string, callback: (banner: RewardsExtension.PublisherBanner) => void) => {}
 }
 
 declare namespace chrome.rewardsNotifications {

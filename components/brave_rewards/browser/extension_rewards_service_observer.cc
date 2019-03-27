@@ -44,6 +44,12 @@ void ExtensionRewardsServiceObserver::OnWalletInitialized(
         extensions::api::brave_rewards::OnWalletCreated::kEventName,
         std::move(args)));
       event_router->BroadcastEvent(std::move(event));
+    } else if (result == ledger::Result::CORRUPTED_WALLET) {
+      std::unique_ptr<extensions::Event> event(new extensions::Event(
+        extensions::events::BRAVE_START,
+        extensions::api::brave_rewards::OnWalletCorrupted::kEventName,
+        std::move(args)));
+      event_router->BroadcastEvent(std::move(event));
     } else if (result != ledger::Result::LEDGER_OK) {
       std::unique_ptr<extensions::Event> event(new extensions::Event(
         extensions::events::BRAVE_WALLET_FAILED,

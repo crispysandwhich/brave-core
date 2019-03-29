@@ -12,6 +12,7 @@ SyncerError ApplyBraveRecords(sync_pb::ClientToServerResponse*, ModelTypeSet*,
 #include "base/time/time.h"
 #include "brave/components/brave_sync/jslib_messages.h"
 #include "components/sync/syncable/syncable_proto_util.h"
+#include "components/sync/engine_impl/loopback_server/loopback_server_entity.h"
 #include "url/gurl.h"
 
 namespace syncer {
@@ -20,9 +21,13 @@ namespace {
 using brave_sync::jslib::Bookmark;
 using brave_sync::jslib::SyncRecord;
 using syncable::Id;
-static const char kCacheGuid[] = "IrcjZ2jyzHDV9Io4+zKcXQ==";
-const char kBookmarkBarTag[] = "bookmark_bar";
-const char kOtherBookmarksTag[] = "other_bookmarks";
+static const char kBookmarkBarTag[] = "bookmark_bar";
+static const char kOtherBookmarksTag[] = "other_bookmarks";
+static const char kBookmarkBarFolderName[] = "Bookmark Bar";
+static const char kOtherBookmarksFolderName[] = "Other Bookmarks";
+// The parent tag for children of the root entity. Entities with this parent are
+// referred to as top level enities.
+static const char kRootParentTag[] = "0";
 
 uint64_t GetIndexByOrder(const std::string& record_order) {
   uint64_t index = 0;
@@ -48,58 +53,54 @@ void AddBookmarkSpecifics(sync_pb::EntitySpecifics* specifics,
   meta_info->set_value(bookmark.order);
 }
 
-void AddPermanentBookmarkSpecifics(sync_pb::EntitySpecifics* specifics,
-                                   const char* tag) {
-  DCHECK(specifics);
-  sync_pb::BookmarkSpecifics* bm_specifics = specifics->mutable_bookmark();
-  bm_specifics->set_title(tag);
-  bm_specifics->set_creation_time_us(
-      base::Time::Now().ToDeltaSinceWindowsEpoch().InMicroseconds());
+void ExtractBookmarkMeta(sync_pb::SyncEntity* entity,
+                         const Bookmark& bookmark) {
+  for (const auto metaInfo : bookmark.metaInfo) {
+    if (metaInfo.key == "originator_cache_guid")
+      entity->set_originator_cache_guid(metaInfo.value);
+    else if (metaInfo.key == "originator_client_item_id")
+      entity->set_originator_client_item_id(metaInfo.value);
+    else if (metaInfo.key == "version") {
+      int64_t version;
+      bool result = base::StringToInt64(metaInfo.value, &version);
+      // TODO(darkdh): not a good place to increase version
+      entity->set_version(version + 1);
+      DCHECK(result);
+    }
+  }
 }
 
 void AddRootForType(sync_pb::SyncEntity* entity, ModelType type) {
   DCHECK(entity);
   sync_pb::EntitySpecifics specifics;
   AddDefaultFieldValue(type, &specifics);
-  std::string root = Id::GetRoot().GetServerId();
-  std::string id = ModelTypeToRootTag(type);
-  entity->set_server_defined_unique_tag(id);
+  std::string server_tag = ModelTypeToRootTag(type);
+  std::string name = syncer::ModelTypeToString(type);
+  std::string id = LoopbackServerEntity::GetTopLevelId(type);
+  entity->set_server_defined_unique_tag(server_tag);
   entity->set_deleted(false);
   entity->set_id_string(id);
-  entity->set_parent_id_string(root);
-  entity->set_non_unique_name(id);
-  entity->set_name(id);
-  entity->set_version(1000);
+  entity->set_parent_id_string(kRootParentTag);
+  entity->set_name(name);
+  entity->set_version(1);
   entity->set_folder(true);
   entity->mutable_specifics()->CopyFrom(specifics);
-  entity->set_originator_cache_guid(
-    std::string(kCacheGuid, base::size(kCacheGuid) - 1));
-  Id client_id = Id::CreateFromClientString("-2");
-  entity->set_originator_client_item_id(client_id.GetServerId());
-  entity->set_position_in_parent(0);
 }
 
-void AddPermanentNode(sync_pb::SyncEntity* entity, const char* tag) {
+void AddPermanentNode(sync_pb::SyncEntity* entity, const std::string& name, const std::string& tag) {
   DCHECK(entity);
   sync_pb::EntitySpecifics specifics;
   AddDefaultFieldValue(BOOKMARKS, &specifics);
-  std::string root = ModelTypeToRootTag(BOOKMARKS);
-  std::string id = std::string(tag);
-  entity->set_server_defined_unique_tag(id);
+  std::string parent = ModelTypeToRootTag(BOOKMARKS);
+  std::string id = tag;
+  std::string parent_id = LoopbackServerEntity::CreateId(BOOKMARKS, parent);
+  entity->set_server_defined_unique_tag(tag);
+  entity->set_deleted(false);
   entity->set_id_string(id);
-  entity->set_parent_id_string(root);
-  entity->set_non_unique_name(id);
-  entity->set_name(id);
+  entity->set_parent_id_string(parent_id);
+  entity->set_name(name);
   entity->set_folder(true);
-  entity->set_version(1000);
-  entity->set_originator_cache_guid(
-    std::string(kCacheGuid, base::size(kCacheGuid) - 1));
-  Id client_id = Id::CreateFromClientString("-2");
-  entity->set_originator_client_item_id(client_id.GetServerId());
-  entity->set_position_in_parent(0);
-  entity->set_ctime(TimeToProtoTime(base::Time::Now()));
-  entity->set_mtime(TimeToProtoTime(base::Time::Now()));
-  AddPermanentBookmarkSpecifics(&specifics, tag);
+  entity->set_version(1);
   entity->mutable_specifics()->CopyFrom(specifics);
 }
 
@@ -121,17 +122,16 @@ void AddBookmarkNode(sync_pb::SyncEntity* entity, const SyncRecord* record) {
     entity->set_id_string(record->objectId);
     if (!bookmark_record.parentFolderObjectId.empty())
       entity->set_parent_id_string(bookmark_record.parentFolderObjectId);
-    else
+    else if (!bookmark_record.hideInToolbar)
       entity->set_parent_id_string(std::string(kBookmarkBarTag));
+    else
+      entity->set_parent_id_string(std::string(kOtherBookmarksTag));
     entity->set_non_unique_name(bookmark_record.site.title);
     entity->set_folder(bookmark_record.isFolder);
-    // TODO(darkdh): set version, originator_cache_guid and
-    // originator_client_item_id in meta info in CommitMessage
-    entity->set_version(1000);
-    entity->set_originator_cache_guid(
-      std::string(kCacheGuid, base::size(kCacheGuid) - 1));
-    Id client_id = Id::CreateFromClientString(record->objectId);
-    entity->set_originator_client_item_id(client_id.GetServerId());
+    entity->set_deleted(false);
+
+    ExtractBookmarkMeta(entity, bookmark_record);
+
     // TODO(darkdh): migrate to UniquePosition
     entity->set_position_in_parent(GetIndexByOrder(bookmark_record.order));
     entity->set_ctime(TimeToProtoTime(base::Time::Now()));
@@ -158,8 +158,9 @@ void ConstructUpdateResponse(sync_pb::GetUpdatesResponse* gu_response,
     if (type == BOOKMARKS) {
       google::protobuf::RepeatedPtrField<sync_pb::SyncEntity> entities;
       AddRootForType(entities.Add(), BOOKMARKS);
-      AddPermanentNode(entities.Add(), kBookmarkBarTag);
-      AddPermanentNode(entities.Add(), kOtherBookmarksTag);
+      AddPermanentNode(entities.Add(), kBookmarkBarFolderName, kBookmarkBarTag);
+      AddPermanentNode(entities.Add(), kOtherBookmarksFolderName,
+                       kOtherBookmarksTag);
       if (records) {
         for (const auto& record : *records.get()) {
           AddBookmarkNode(entities.Add(), record.get());

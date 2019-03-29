@@ -114,7 +114,7 @@ void CreateEmptyResolveList(
   }
 }
 
-}
+}   // namespace
 
 void ProfileSyncService::OnSetupSyncHaveCode(const std::string& sync_words,
     const std::string& device_name) {
@@ -410,8 +410,10 @@ void ProfileSyncService::OnResolvedSyncRecords(
     // Send records to syncer
     if (get_record_cb_)
       engine_->DispatchGetRecordsCallback(get_record_cb_, std::move(records));
-    DCHECK(wevent_);
-    wevent_->Signal();
+    if (wevent_) {
+      wevent_->Signal();
+      wevent_ = nullptr;
+    }
   } else if (category_name == kHistorySites) {
     NOTIMPLEMENTED();
   }
@@ -634,9 +636,30 @@ void ProfileSyncService::BraveEngineParamsInit(
 }
 
 void ProfileSyncService::OnNudgeSyncCycle(
-    brave_sync::RecordsListPtr records_list) {
+    brave_sync::RecordsListPtr records) {
   LOG(ERROR) << __func__;
-  LOG(ERROR) << records_list->size();
+  for (auto& record : *records) {
+    record->deviceId = brave_sync_prefs_->GetThisDeviceId();
+    if (record->has_bookmark()) {
+      auto* bookmark = record->mutable_bookmark();
+      if (bookmark->parentOrder.empty() &&
+          bookmark->parentFolderObjectId.empty()) {
+        // bookmark toolbar
+        if (!bookmark->hideInToolbar)
+          bookmark->parentOrder =
+            brave_sync_prefs_->GetBookmarksBaseOrder() + '0';
+        // other bookmarks
+        else
+          // TODO(darkdh): put this to 1 when old code fix the order
+          bookmark->parentOrder =
+            brave_sync_prefs_->GetBookmarksBaseOrder() + '0';
+      }
+    }
+  }
+  if (!records->empty())
+    GetBraveSyncClient()->SendSyncRecords(
+      brave_sync::jslib_const::SyncRecordType_BOOKMARKS, *records);
+  GetBraveSyncClient()->ClearOrderMap();
 }
 
 void ProfileSyncService::OnPollSyncCycle(GetRecordsCallback cb,

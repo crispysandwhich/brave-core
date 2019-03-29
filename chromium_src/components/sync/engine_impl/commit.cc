@@ -26,6 +26,7 @@ SyncerError PostBraveCommit(sync_pb::ClientToServerMessage* message,
 namespace syncer {
 namespace {
 using brave_sync::jslib::SyncRecord;
+using brave_sync::jslib::MetaInfo;
 const char kBookmarkBarTag[] = "bookmark_bar";
 const char kOtherBookmarksTag[] = "other_bookmarks";
 
@@ -67,8 +68,6 @@ ConvertCommitsToBraveRecords(sync_pb::ClientToServerMessage* message,
       LOG(ERROR) << u_pos.ToDebugString();
       LOG(ERROR) << u_pos.GetSuffixForTest();
       auto record = std::make_unique<SyncRecord>();
-      // TODO(darkdh): fill it in ProfileSyncService
-      // record->deviceId = sync_prefs_->GetThisDeviceId();
       record->objectData = brave_sync::jslib_const::SyncObjectData_BOOKMARK;
 
       auto bookmark = std::make_unique<brave_sync::jslib::Bookmark>();
@@ -79,8 +78,8 @@ ConvertCommitsToBraveRecords(sync_pb::ClientToServerMessage* message,
       bookmark->site.creationTime =
         ProtoTimeToTime(bm_specifics.creation_time_us());
       bookmark->site.favicon = bm_specifics.icon_url();
-      // Url may have type OTHER_NODE if it is in Deleted Bookmarks
       bookmark->isFolder = entity.folder();
+      // only mattters for direct children of permanent nodes
       bookmark->hideInToolbar = entity.parent_id_string() != kBookmarkBarTag;
 
       if (entity.parent_id_string() != kBookmarkBarTag &&
@@ -91,6 +90,18 @@ ConvertCommitsToBraveRecords(sync_pb::ClientToServerMessage* message,
       for (int i = 0; i < bm_specifics.meta_info_size(); ++i) {
         if (bm_specifics.meta_info(i).key() == "order") {
           bookmark->order = bm_specifics.meta_info(i).value();
+        }
+        if (bm_specifics.meta_info(i).key() == "prevObjectId") {
+          bookmark->prevObjectId = bm_specifics.meta_info(i).value();
+        }
+        if (bm_specifics.meta_info(i).key() == "prevOrder") {
+          bookmark->prevOrder = bm_specifics.meta_info(i).value();
+        }
+        if (bm_specifics.meta_info(i).key() == "nextOrder") {
+          bookmark->nextOrder = bm_specifics.meta_info(i).value();
+        }
+        if (bm_specifics.meta_info(i).key() == "parentOrder") {
+          bookmark->parentOrder = bm_specifics.meta_info(i).value();
         }
       }
 
@@ -105,26 +116,25 @@ ConvertCommitsToBraveRecords(sync_pb::ClientToServerMessage* message,
       } else {
         // TODO(darkdh): handle delete and update
         record->objectId = entity.id_string();
+        if (bm_specifics.ByteSize() == 0)
+          record->action = brave_sync::jslib::SyncRecord::Action::A_DELETE;
+        else
+          record->action = brave_sync::jslib::SyncRecord::Action::A_UPDATE;
       }
 
-      // originator_cache_guid and originator_client_item_id
-      bookmark->fields.push_back(cache_guid);
-      bookmark->fields.push_back(entity.id_string());
+      MetaInfo metaInfo;
+      metaInfo.key = "originator_cache_guid";
+      metaInfo.value = cache_guid;
+      bookmark->metaInfo.push_back(metaInfo);
+
+      metaInfo.key = "originator_client_item_id";
+      metaInfo.value = entity.id_string();
+      bookmark->metaInfo.push_back(metaInfo);
+
+      metaInfo.key = "version";
+      metaInfo.value = std::to_string(entity.version());
+      bookmark->metaInfo.push_back(metaInfo);
 #if 0
-      int index = node->parent()->GetIndexOf(node);
-      std::string prev_object_id;
-      GetPrevObjectId(node->parent(), index, &prev_object_id);
-      bookmark->prevObjectId = prev_object_id;
-
-      std::string prev_order, next_order, parent_order;
-      GetOrder(node->parent(), index, &prev_order, &next_order, &parent_order);
-      if (parent_order.empty() && node->parent()->is_permanent_node())
-        parent_order =
-          sync_prefs_->GetBookmarksBaseOrder() + std::to_string(index);
-      bookmark->prevOrder = prev_order;
-      bookmark->nextOrder = next_order;
-      bookmark->parentOrder = parent_order;
-
       auto* deleted_node = GetDeletedNodeRoot();
       CHECK(deleted_node);
       std::string sync_timestamp;

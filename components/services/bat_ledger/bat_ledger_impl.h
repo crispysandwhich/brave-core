@@ -134,6 +134,9 @@ class BatLedgerImpl : public mojom::BatLedger,
       GetConfirmationsHistoryCallback callback) override;
   void GetRewardsInternalsInfo(
       GetRewardsInternalsInfoCallback callback) override;
+  void PanelLoadPublisherList(
+      uint64_t window_id,
+      const std::string& publisher_key) override;
 
  private:
   void SetCatalogIssuers(const std::string& info) override;

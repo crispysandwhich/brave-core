@@ -114,3 +114,10 @@ export const onSettingSave = (key: string, value: any) => action(types.ON_SETTIN
   key,
   value
 })
+
+export const refreshPublisher = (windowId: number, publisherKey: string) => action(types.REFRESH_PUBLISHER, {
+  windowId,
+  publisherKey
+})
+
+export const resetPublisherRefreshed = () => action(types.RESET_PUBLISHER_REFRESHED)

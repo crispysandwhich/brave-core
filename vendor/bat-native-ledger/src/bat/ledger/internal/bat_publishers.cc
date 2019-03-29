@@ -868,4 +868,36 @@ void BatPublishers::onPublisherBanner(
   callback(std::move(new_banner));
 }
 
+void BatPublishers::RefreshPublisherVerifiedStatus(
+    const std::string& publisher_key,
+    ledger::OnRefreshPublisherVerifiedStatusCallback callback) {
+  bool verified = isVerified(publisher_key);
+  ledger_->GetPublisherInfo(publisher_key,
+      std::bind(&BatPublishers::SetPublisherVerified,
+                this,
+                _1,
+                _2,
+                verified,
+                callback));
+
+}
+
+void BatPublishers::SetPublisherVerified(
+    ledger::Result result,
+    std::unique_ptr<ledger::PublisherInfo> publisher_info,
+    bool verified,
+    ledger::OnRefreshPublisherVerifiedStatusCallback callback) {
+  if (!publisher_info || result != ledger::Result::LEDGER_OK) {
+    callback(result, std::move(publisher_info));
+    return;
+  }
+  publisher_info->verified = verified;
+  std::unique_ptr<ledger::PublisherInfo> panel_info =
+      std::make_unique<ledger::PublisherInfo>(*publisher_info);
+  ledger_->SetPublisherInfo(std::move(publisher_info));
+  callback(
+      result,
+      std::move(panel_info));
+}
+
 }  // namespace braveledger_bat_publishers

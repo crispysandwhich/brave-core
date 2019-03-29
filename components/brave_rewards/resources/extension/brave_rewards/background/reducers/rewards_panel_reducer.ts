@@ -119,6 +119,10 @@ export const rewardsPanelReducer = (state: RewardsExtension.State | undefined, a
         ...state,
         publishers
       }
+      if (state.refreshingPublisher) {
+        state.refreshingPublisher = false
+        state.publisherRefreshed = true
+      }
       break
     }
     case types.GET_WALLET_PROPERTIES:
@@ -304,6 +308,18 @@ export const rewardsPanelReducer = (state: RewardsExtension.State | undefined, a
         chrome.braveRewards.saveSetting(key, value)
       }
       break
+    }
+    case types.REFRESH_PUBLISHER: {
+      state = { ...state }
+      state.refreshingPublisher = true
+      state.publisherRefreshed = false
+      chrome.braveRewards.refreshPublisher(payload.windowId, payload.publisherKey)
+      break
+    }
+    case types.RESET_PUBLISHER_REFRESHED: {
+      state = { ...state }
+      state.refreshingPublisher = false
+      state.publisherRefreshed = false
     }
   }
   return state

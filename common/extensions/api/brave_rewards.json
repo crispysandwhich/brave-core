@@ -477,6 +477,21 @@
             "type": "string"
           }
         ]
+      },
+      {
+        "name": "refreshPublisher",
+        "type": "function",
+        "description": "Refreshes verified status for individual publisher",
+        "parameters": [
+          {
+            "name": "windowId",
+            "type": "integer"
+          },
+          {
+            "name": "publisherKey",
+            "type": "string"
+          }
+        ]
       }
     ]
   }

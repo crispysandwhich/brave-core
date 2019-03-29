@@ -183,6 +183,10 @@ class RewardsService : public KeyedService {
   virtual void GetConfirmationsHistory(
       brave_rewards::ConfirmationsHistoryCallback callback) = 0;
 
+  virtual void RefreshPublisherList(
+      uint64_t window_id,
+      const std::string& publisher_key) = 0;
+
   void AddObserver(RewardsServiceObserver* observer);
   void RemoveObserver(RewardsServiceObserver* observer);
 

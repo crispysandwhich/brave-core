@@ -424,4 +424,10 @@ void BatLedgerImpl::GetRewardsInternalsInfo(
   std::move(callback).Run(info.ToJson());
 }
 
+void BatLedgerImpl::PanelLoadPublisherList(
+    uint64_t window_id,
+    const std::string& publisher_key) {
+  ledger_->PanelLoadPublisherList(window_id, publisher_key);
+}
+
 }  // namespace bat_ledger

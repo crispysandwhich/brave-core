@@ -62,6 +62,8 @@ using ConfirmationsHistoryCallback = std::function<void(
 using GetExcludedPublishersNumberDBCallback = std::function<void(uint32_t)>;
 using OnWalletPropertiesCallback = std::function<void(const ledger::Result,
                                   std::unique_ptr<ledger::WalletInfo>)>;
+using OnRefreshPublisherVerifiedStatusCallback =
+    std::function<void(ledger::Result, std::unique_ptr<ledger::PublisherInfo>)>;
 
 class LEDGER_EXPORT Ledger {
  public:
@@ -282,6 +284,9 @@ class LEDGER_EXPORT Ledger {
       const uint64_t to_timestamp_seconds,
       ledger::ConfirmationsHistoryCallback callback) = 0;
   virtual void GetRewardsInternalsInfo(ledger::RewardsInternalsInfo* info) = 0;
+  virtual void PanelLoadPublisherList(
+      uint64_t window_id,
+      const std::string& publisher_key) = 0;
 };
 
 }  // namespace ledger

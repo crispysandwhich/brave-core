@@ -291,5 +291,25 @@ ExtensionFunction::ResponseAction BraveRewardsSaveSettingFunction::Run() {
   return RespondNow(NoArguments());
 }
 
+BraveRewardsRefreshPublisherFunction::~BraveRewardsRefreshPublisherFunction () {
+}
+
+ExtensionFunction::ResponseAction BraveRewardsRefreshPublisherFunction::Run() {
+  std::unique_ptr<brave_rewards::RefreshPublisher::Params> params(
+      brave_rewards::RefreshPublisher::Params::Create(*args_));
+
+  Profile* profile = Profile::FromBrowserContext(browser_context());
+  RewardsService* rewards_service =
+    RewardsServiceFactory::GetForProfile(profile);
+
+  if (rewards_service) {
+    rewards_service->RefreshPublisherList(
+      params->window_id,
+      params->publisher_key);
+  }
+
+  return RespondNow(NoArguments());
+}
+
 }  // namespace api
 }  // namespace extensions

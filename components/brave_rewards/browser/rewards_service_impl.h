@@ -194,6 +194,10 @@ class RewardsServiceImpl : public RewardsService,
   void GetAddressesForPaymentId(const GetAddressesCallback& callback) override;
   std::pair<uint64_t, uint64_t> GetEarningsRange();
 
+  void RefreshPublisherList(
+      uint64_t window_id,
+      const std::string& publisher_key) override;
+
   // Testing methods
   void SetLedgerEnvForTesting();
 

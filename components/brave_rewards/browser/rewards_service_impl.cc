@@ -2870,4 +2870,12 @@ void RewardsServiceImpl::OnDeleteActivityInfo(
   }
 }
 
+void RewardsServiceImpl::RefreshPublisherList(
+    uint64_t window_id,
+    const std::string& publisher_key) {
+  if (!Connected())
+    return;
+  bat_ledger_->PanelLoadPublisherList(window_id, publisher_key);
+}
+
 }  // namespace brave_rewards

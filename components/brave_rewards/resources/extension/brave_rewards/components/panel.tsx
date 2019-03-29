@@ -51,6 +51,7 @@ export class Panel extends React.Component<Props, State> {
       })
     }
 
+    this.actions.resetPublisherRefreshed()
     this.actions.getWalletProperties()
     this.actions.getCurrentReport()
 
@@ -335,8 +336,14 @@ export class Panel extends React.Component<Props, State> {
     }
   }
 
+  refreshPublisher = () => {
+    const publisher: RewardsExtension.Publisher | undefined = this.getPublisher()
+    const publisherKey = publisher && publisher.publisher_key
+    this.actions.refreshPublisher(this.props.windowId, publisherKey)
+  }
+
   render () {
-    const { pendingContributionTotal, enabledAC } = this.props.rewardsPanelData
+    const { pendingContributionTotal, enabledAC, publisherRefreshed, refreshingPublisher } = this.props.rewardsPanelData
     const { balance, rates, grants } = this.props.rewardsPanelData.walletProperties
     const publisher: RewardsExtension.Publisher | undefined = this.getPublisher()
     const converted = utils.convertBalance(balance.toString(), rates)
@@ -410,6 +417,9 @@ export class Panel extends React.Component<Props, State> {
               showUnVerified={!publisher.verified}
               acEnabled={enabledAC}
               moreLink={'https://brave.com/faq-rewards/#unclaimed-funds'}
+              onRefreshPublisher={this.refreshPublisher}
+              refreshingPublisher={refreshingPublisher}
+              publisherRefreshed={publisherRefreshed}
             />
             : null
           }

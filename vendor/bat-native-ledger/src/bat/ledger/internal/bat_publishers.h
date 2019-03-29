@@ -125,6 +125,10 @@ class BatPublishers : public ledger::LedgerCallbackHandler {
 
   bool isVerified(const std::string& publisher_id);
 
+  void RefreshPublisherVerifiedStatus(
+      const std::string& publisher_key,
+      ledger::OnRefreshPublisherVerifiedStatusCallback callback);
+
  private:
   void onPublisherActivitySave(uint64_t windowId,
                                const ledger::VisitData& visit_data,
@@ -197,6 +201,12 @@ class BatPublishers : public ledger::LedgerCallbackHandler {
                          ledger::PublisherBanner banner,
                          ledger::Result result,
                          std::unique_ptr<ledger::PublisherInfo> publisher_info);
+
+  void SetPublisherVerified(
+      ledger::Result result,
+      std::unique_ptr<ledger::PublisherInfo> publisher_info,
+      bool verified,
+      ledger::OnRefreshPublisherVerifiedStatusCallback callback);
 
   bat_ledger::LedgerImpl* ledger_;  // NOT OWNED
 

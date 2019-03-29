@@ -165,6 +165,16 @@ class BraveRewardsSaveSettingFunction : public UIThreadExtensionFunction {
   ResponseAction Run() override;
 };
 
+class BraveRewardsRefreshPublisherFunction : public UIThreadExtensionFunction {
+ public:
+  DECLARE_EXTENSION_FUNCTION("braveRewards.refreshPublisher", UNKNOWN)
+
+ protected:
+  ~BraveRewardsRefreshPublisherFunction() override;
+
+  ResponseAction Run() override;
+};
+
 }  // namespace api
 }  // namespace extensions
 

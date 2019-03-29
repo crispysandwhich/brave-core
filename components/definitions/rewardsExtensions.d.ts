@@ -13,6 +13,8 @@ declare namespace RewardsExtension {
     walletCreating: boolean
     walletCreateFailed: boolean
     walletProperties: WalletProperties
+    refreshingPublisher: boolean
+    publisherRefreshed: boolean
   }
 
   interface ApplicationState {

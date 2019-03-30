@@ -62,7 +62,7 @@ bool PublisherInfoDatabase::Init() {
 
   if (!CreatePublisherInfoTable() ||
       !CreateContributionInfoTable() ||
-      !CreateActivityInfoTable() ||
+      !CreateActivityInfoTable(true) ||
       !CreateMediaPublisherInfoTable() ||
       !CreateRecurringDonationTable() ||
       !CreatePendingContributionsTable()) {
@@ -417,7 +417,7 @@ int PublisherInfoDatabase::GetExcludedPublishersCount() {
  * ACTIVITY INFO
  *
  */
-bool PublisherInfoDatabase::CreateActivityInfoTable() {
+bool PublisherInfoDatabase::CreateActivityInfoTable(bool current_version) {
   DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
 
   const char* name = "activity_info";
@@ -435,7 +435,13 @@ bool PublisherInfoDatabase::CreateActivityInfoTable() {
       "visits INTEGER DEFAULT 0 NOT NULL,"
       "score DOUBLE DEFAULT 0 NOT NULL,"
       "percent INTEGER DEFAULT 0 NOT NULL,"
-      "weight DOUBLE DEFAULT 0 NOT NULL,"
+      "weight DOUBLE DEFAULT 0 NOT NULL,");
+  if (!current_version) {
+    sql.append(
+        "month INTEGER NOT NULL,"
+        "year INTEGER NOT NULL,");
+  }
+  sql.append(
       "reconcile_stamp INTEGER DEFAULT 0 NOT NULL,"
       "CONSTRAINT activity_unique "
       "UNIQUE (publisher_id, reconcile_stamp) "
@@ -1081,7 +1087,7 @@ bool PublisherInfoDatabase::MigrateV3toV4() {
       return false;
     }
 
-    if (!CreateActivityInfoTable()) {
+    if (!CreateActivityInfoTable(false)) {
       return false;
     }
 
@@ -1153,7 +1159,7 @@ bool PublisherInfoDatabase::MigrateV5toV6() {
       return false;
     }
 
-    if (!CreateActivityInfoTable()) {
+    if (!CreateActivityInfoTable(true)) {
       return false;
     }
 

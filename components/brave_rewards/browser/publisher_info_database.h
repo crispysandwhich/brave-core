@@ -107,7 +107,7 @@ class PublisherInfoDatabase {
 
   bool CreatePublisherInfoTable();
 
-  bool CreateActivityInfoTable();
+  bool CreateActivityInfoTable(bool currentVersion);
 
   bool CreateActivityInfoIndex();
 

@@ -5,5 +5,8 @@
 window.BravePatching.registerPolymerBehaviors({
   'settings-clear-browsing-data-dialog': [
     BraveClearBrowsingDataOnExitBehavior
+  ],
+  'settings-reset-profile-dialog': [
+    BraveResetProfileDialogBehavior
   ]
 })

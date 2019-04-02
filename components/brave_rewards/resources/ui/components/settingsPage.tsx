@@ -8,7 +8,7 @@ import { connect } from 'react-redux'
 
 // Components
 import { Column, Grid } from 'brave-ui/components'
-import { MainToggle, SettingsPage as Page } from 'brave-ui/features/rewards'
+import { DisabledBox, MainToggle, SettingsPage as Page } from 'brave-ui/features/rewards'
 import PageWallet from './pageWallet'
 import AdsBox from './adsBox'
 import ContributeBox from './contributeBox'
@@ -99,6 +99,18 @@ class SettingsPage extends React.Component<Props, {}> {
     }
   }
 
+  openTOS () {
+    chrome.tabs.create({
+      url: 'https://brave.com/terms-of-use'
+    })
+  }
+
+  openPrivacyPolicy () {
+    chrome.tabs.create({
+      url: 'https://brave.com/privacy#rewards'
+    })
+  }
+
   getGrantClaims = () => {
     const { grants } = this.props.rewardsData
 
@@ -138,7 +150,14 @@ class SettingsPage extends React.Component<Props, {}> {
               onToggle={this.onToggle}
               enabled={enabledMain}
               testId={'enableMain'}
+              onTOSClick={this.openPrivacyPolicy}
+              onPrivacyClick={this.openTOS}
             />
+            {
+              !enabledMain
+              ? <DisabledBox />
+              : null
+            }
             <AdsBox />
             <ContributeBox />
             <DonationBox />

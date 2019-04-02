@@ -37,3 +37,5 @@ export const getReconcileStamp = () => action(types.GET_RECONCILE_STAMP)
 export const onReconcileStamp = (stamp: number) => action(types.ON_RECONCILE_STAMP, {
   stamp
 })
+
+export const resetDefaults = () => action(types.ON_RESET)

@@ -63,3 +63,7 @@ chrome.braveRewards.onPublisherListNormalized.addListener((properties: RewardsEx
 chrome.braveRewards.onExcludedSitesChanged.addListener((properties: RewardsExtension.ExcludedSitesChanged) => {
   rewardsPanelActions.onExcludedSitesChanged(properties)
 })
+
+chrome.braveRewards.onReset.addListener(() => {
+  rewardsPanelActions.onReset()
+})

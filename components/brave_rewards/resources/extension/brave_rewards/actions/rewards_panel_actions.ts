@@ -114,3 +114,5 @@ export const onSettingSave = (key: string, value: any) => action(types.ON_SETTIN
   key,
   value
 })
+
+export const onReset = () => action(types.ON_RESET)

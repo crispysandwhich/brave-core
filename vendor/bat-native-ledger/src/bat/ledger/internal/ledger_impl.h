@@ -437,6 +437,7 @@ class LedgerImpl : public ledger::Ledger,
 
   scoped_refptr<base::SequencedTaskRunner> GetTaskRunner();
   void GetRewardsInternalsInfo(ledger::RewardsInternalsInfo* info) override;
+  void DeleteFiles(ledger::OnResetStateCallback callback) override;
 
  private:
   void AddRecurringPayment(const std::string& publisher_id,
@@ -500,6 +501,12 @@ class LedgerImpl : public ledger::Ledger,
   void OnPublisherInfoSavedInternal(
       ledger::Result result,
       std::unique_ptr<ledger::PublisherInfo> info);
+
+  void ResetState();
+
+  void OnResetConfirmationsState(
+      ledger::OnResetStateCallback callback,
+      bool confirmations_result);
 
   ledger::LedgerClient* ledger_client_;
   std::unique_ptr<braveledger_bat_client::BatClient> bat_client_;

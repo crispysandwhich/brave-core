@@ -103,6 +103,7 @@ interface BatLedger {
   GetConfirmationsHistory(uint64 from_timestamp_seconds,
       uint64 to_timestamp_seconds) => (string transactions);
   GetRewardsInternalsInfo() => (string info);
+  DeleteStateFiles() => (bool success);
 };
 
 interface BatLedgerClient {
@@ -179,4 +180,5 @@ interface BatLedgerClient {
   ConfirmationsTransactionHistoryDidChange();
 
   GetExcludedPublishersNumberDB() => (uint32 number);
+  DeleteClientStateFiles() => (bool success);
 };

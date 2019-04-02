@@ -30,7 +30,8 @@ export const enum types {
   ON_ENABLED_AC = '@@rewards_panel/ON_ENABLED_AC',
   ON_PUBLISHER_LIST_NORMALIZED = '@@rewards_panel/ON_PUBLISHER_LIST_NORMALIZED',
   ON_EXCLUDED_SITES_CHANGED = '@@rewards_panel/ON_EXCLUDED_SITES_CHANGED',
-  ON_SETTING_SAVE = '@@rewards_panel/ON_SETTING_SAVE'
+  ON_SETTING_SAVE = '@@rewards_panel/ON_SETTING_SAVE',
+  ON_RESET = '@@rewards_panel/ON_RESET'
 }
 
 // Note: This declaration must match the RewardsNotificationType enum in

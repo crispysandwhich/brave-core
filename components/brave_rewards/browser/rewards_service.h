@@ -71,6 +71,7 @@ using GetRewardsMainEnabledCallback = base::Callback<void(bool)>;
 using ConfirmationsHistoryCallback = base::Callback<void(int, double)>;
 using GetRewardsInternalsInfoCallback = base::OnceCallback<void(
     std::unique_ptr<brave_rewards::RewardsInternalsInfo>)>;
+using ResetStateCallback = base::OnceCallback<void(bool)>;
 
 class RewardsService : public KeyedService {
  public:
@@ -182,6 +183,7 @@ class RewardsService : public KeyedService {
       const GetAddressesCallback& callback) = 0;
   virtual void GetConfirmationsHistory(
       brave_rewards::ConfirmationsHistoryCallback callback) = 0;
+  virtual void Reset(ResetStateCallback callback) = 0;
 
   void AddObserver(RewardsServiceObserver* observer);
   void RemoveObserver(RewardsServiceObserver* observer);

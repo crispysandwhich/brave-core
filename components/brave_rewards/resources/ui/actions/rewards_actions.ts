@@ -193,3 +193,5 @@ export const onAdsIsSupportedRegion = (supported: boolean) => action(types.ON_AD
 })
 
 export const getRewardsMainEnabled = () => action(types.GET_REWARDS_MAIN_ENABLED)
+
+export const resetDefaults = () => action(types.ON_RESET)

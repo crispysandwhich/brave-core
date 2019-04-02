@@ -159,6 +159,10 @@ window.cr.define('brave_rewards', function () {
     getActions().onAdsIsSupportedRegion(supported)
   }
 
+  function resetDefaults () {
+    getActions().resetDefaults()
+  }
+
   return {
     initialize,
     walletCreated,
@@ -187,7 +191,8 @@ window.cr.define('brave_rewards', function () {
     addressesForPaymentId,
     confirmationsHistory,
     confirmationsHistoryChanged,
-    adsIsSupportedRegion
+    adsIsSupportedRegion,
+    resetDefaults
   }
 })
 

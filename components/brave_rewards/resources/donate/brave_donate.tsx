@@ -75,12 +75,17 @@ window.cr.define('brave_rewards_donate', function () {
     getActions().onReconcileStamp(stamp)
   }
 
+  function resetDefaults () {
+    getActions().resetDefaults()
+  }
+
   return {
     initialize,
     publisherBanner,
     walletProperties,
     recurringDonations,
-    reconcileStamp
+    reconcileStamp,
+    resetDefaults
   }
 })
 

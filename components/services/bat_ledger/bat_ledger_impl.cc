@@ -424,4 +424,21 @@ void BatLedgerImpl::GetRewardsInternalsInfo(
   std::move(callback).Run(info.ToJson());
 }
 
+void BatLedgerImpl::OnDeleteStateFiles(
+    CallbackHolder<DeleteStateFilesCallback>* holder,
+    bool success) {
+  if (holder->is_valid()) {
+    std::move(holder->get()).Run(success);
+  }
+  delete holder;
+}
+
+void BatLedgerImpl::DeleteStateFiles(
+    DeleteStateFilesCallback callback) {
+  auto* holder = new CallbackHolder<DeleteStateFilesCallback>(
+      AsWeakPtr(), std::move(callback));
+  ledger_->DeleteFiles(
+      std::bind(BatLedgerImpl::OnDeleteStateFiles, holder, _1));
+}
+
 }  // namespace bat_ledger

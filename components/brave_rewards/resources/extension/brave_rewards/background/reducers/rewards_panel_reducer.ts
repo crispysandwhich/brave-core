@@ -305,6 +305,11 @@ export const rewardsPanelReducer = (state: RewardsExtension.State | undefined, a
       }
       break
     }
+    case types.ON_RESET: {
+      state = { ...storage.defaultState }
+      setBadgeText(state)
+      break
+    }
   }
   return state
 }

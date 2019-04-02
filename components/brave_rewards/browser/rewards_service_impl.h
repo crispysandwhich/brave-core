@@ -193,6 +193,7 @@ class RewardsServiceImpl : public RewardsService,
 
   void GetAddressesForPaymentId(const GetAddressesCallback& callback) override;
   std::pair<uint64_t, uint64_t> GetEarningsRange();
+  void Reset(ResetStateCallback callback) override;
 
   // Testing methods
   void SetLedgerEnvForTesting();
@@ -448,6 +449,12 @@ class RewardsServiceImpl : public RewardsService,
                                  const std::string& json_props);
   void SetRewardsMainEnabledPref(bool enabled);
   void SetRewardsMainEnabledMigratedPref(bool enabled);
+  void OnReset(ResetStateCallback callback, bool success);
+  void DeleteClientStateFiles(
+      ledger::OnResetClientStateCallback callback) override;
+  void OnDeleteClientStateFiles(
+      ledger::OnResetClientStateCallback callback,
+      bool success);
 
   bool Connected() const;
   void ConnectionClosed();

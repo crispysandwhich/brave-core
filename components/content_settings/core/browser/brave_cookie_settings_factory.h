@@ -16,8 +16,7 @@ class BraveCookieSettings;
 
 class Profile;
 
-class BraveCookieSettingsFactory
-    : public CookieSettingsFactory {
+class BraveCookieSettingsFactory : public CookieSettingsFactory {
  public:
   static scoped_refptr<content_settings::BraveCookieSettings> GetForProfile(
       Profile* profile);

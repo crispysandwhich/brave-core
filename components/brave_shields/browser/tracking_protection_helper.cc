@@ -26,42 +26,37 @@ bool TrackingProtectionHelper::IsSmartTrackingProtectionEnabled() {
 }
 
 TrackingProtectionHelper::TrackingProtectionHelper(WebContents* web_contents)
-    : WebContentsObserver(web_contents) {
-}
+    : WebContentsObserver(web_contents) {}
 
-TrackingProtectionHelper::~TrackingProtectionHelper() {
-}
+TrackingProtectionHelper::~TrackingProtectionHelper() {}
 
 void TrackingProtectionHelper::DidStartNavigation(NavigationHandle* handle) {
   if (handle->IsInMainFrame() &&
       !ui::PageTransitionIsRedirect(handle->GetPageTransition())) {
     RenderFrameHost* rfh = web_contents()->GetMainFrame();
-    g_brave_browser_process->tracking_protection_service()->
-      SetStartingSiteForRenderFrame(handle->GetURL(),
-                                    rfh->GetProcess()->GetID(),
-                                    rfh->GetRoutingID());
+    g_brave_browser_process->tracking_protection_service()
+        ->SetStartingSiteForRenderFrame(
+            handle->GetURL(), rfh->GetProcess()->GetID(), rfh->GetRoutingID());
   }
 }
 
-void TrackingProtectionHelper::RenderFrameDeleted(RenderFrameHost*
-  render_frame_host) {
-  g_brave_browser_process->tracking_protection_service()->
-    DeleteRenderFrameKey(render_frame_host->GetProcess()->GetID(),
+void TrackingProtectionHelper::RenderFrameDeleted(
+    RenderFrameHost* render_frame_host) {
+  g_brave_browser_process->tracking_protection_service()->DeleteRenderFrameKey(
+      render_frame_host->GetProcess()->GetID(),
       render_frame_host->GetRoutingID());
 }
 
 void TrackingProtectionHelper::RenderFrameHostChanged(
-    RenderFrameHost* old_host, RenderFrameHost* new_host) {
+    RenderFrameHost* old_host,
+    RenderFrameHost* new_host) {
   if (!old_host || old_host->GetParent() || new_host->GetParent()) {
     return;
   }
 
-  g_brave_browser_process->tracking_protection_service()->
-    ModifyRenderFrameKey(
-      old_host->GetProcess()->GetID(),
-      old_host->GetRoutingID(),
-      new_host->GetProcess()->GetID(),
-      new_host->GetRoutingID());
+  g_brave_browser_process->tracking_protection_service()->ModifyRenderFrameKey(
+      old_host->GetProcess()->GetID(), old_host->GetRoutingID(),
+      new_host->GetProcess()->GetID(), new_host->GetRoutingID());
 }
 
 WEB_CONTENTS_USER_DATA_KEY_IMPL(TrackingProtectionHelper)

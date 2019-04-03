@@ -1,4 +1,7 @@
-// Copyright (c) 2019 The Brave Authors. All rights reserved.
+/* Copyright (c) 2019 The Brave Authors. All rights reserved.
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this file,
+ * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 #include "brave/browser/renderer_host/brave_render_message_filter.h"
 
@@ -13,11 +16,10 @@ using brave_shields::BraveShieldsWebContentsObserver;
 using content_settings::CookieSettings;
 
 BraveRenderMessageFilter::BraveRenderMessageFilter(int render_process_id,
-  Profile* profile)
-  : ChromeRenderMessageFilter(render_process_id, profile),
-    host_content_settings_map_(HostContentSettingsMapFactory::GetForProfile(
-      profile)) {
-}
+                                                   Profile* profile)
+    : ChromeRenderMessageFilter(render_process_id, profile),
+      host_content_settings_map_(
+          HostContentSettingsMapFactory::GetForProfile(profile)) {}
 
 BraveRenderMessageFilter::~BraveRenderMessageFilter() {}
 
@@ -37,15 +39,13 @@ void BraveRenderMessageFilter::IsCookieAccessAllowed(int render_frame_id,
                                                      const GURL& origin_url,
                                                      const GURL& top_origin_url,
                                                      bool* allowed) {
-   GURL tab_origin =
-    BraveShieldsWebContentsObserver::GetTabURLFromRenderFrameInfo(
-          render_process_id_, render_frame_id, -1).GetOrigin();
-  *allowed = cookie_settings_->IsCookieAccessAllowed(host_content_settings_map_,
-                                                     render_process_id_,
-                                                     render_frame_id,
-                                                     origin_url,
-                                                     top_origin_url,
-                                                     tab_origin);
+  GURL tab_origin =
+      BraveShieldsWebContentsObserver::GetTabURLFromRenderFrameInfo(
+          render_process_id_, render_frame_id, -1)
+          .GetOrigin();
+  *allowed = cookie_settings_->IsCookieAccessAllowed(
+      host_content_settings_map_, render_process_id_, render_frame_id,
+      origin_url, top_origin_url, tab_origin);
 }
 
 void BraveRenderMessageFilter::OnAllowDatabase(int render_frame_id,
@@ -54,10 +54,8 @@ void BraveRenderMessageFilter::OnAllowDatabase(int render_frame_id,
                                                bool* allowed) {
   IsCookieAccessAllowed(render_frame_id, origin_url, top_origin_url, allowed);
   if (*allowed) {
-    ChromeRenderMessageFilter::OnAllowDatabase(render_frame_id,
-                                               origin_url,
-                                               top_origin_url,
-                                               allowed);
+    ChromeRenderMessageFilter::OnAllowDatabase(render_frame_id, origin_url,
+                                               top_origin_url, allowed);
   }
 }
 
@@ -68,11 +66,8 @@ void BraveRenderMessageFilter::OnAllowDOMStorage(int render_frame_id,
                                                  bool* allowed) {
   IsCookieAccessAllowed(render_frame_id, origin_url, top_origin_url, allowed);
   if (*allowed) {
-    ChromeRenderMessageFilter::OnAllowDOMStorage(render_frame_id,
-                                                 origin_url,
-                                                 top_origin_url,
-                                                 local,
-                                                 allowed);
+    ChromeRenderMessageFilter::OnAllowDOMStorage(
+        render_frame_id, origin_url, top_origin_url, local, allowed);
   }
 }
 
@@ -82,9 +77,7 @@ void BraveRenderMessageFilter::OnAllowIndexedDB(int render_frame_id,
                                                 bool* allowed) {
   IsCookieAccessAllowed(render_frame_id, origin_url, top_origin_url, allowed);
   if (*allowed) {
-    ChromeRenderMessageFilter::OnAllowIndexedDB(render_frame_id,
-                                                origin_url,
-                                                top_origin_url,
-                                                allowed);
+    ChromeRenderMessageFilter::OnAllowIndexedDB(render_frame_id, origin_url,
+                                                top_origin_url, allowed);
   }
 }

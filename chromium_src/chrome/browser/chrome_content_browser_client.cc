@@ -3,8 +3,8 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-#include "build/build_config.h"  // For OS_MACOSX
 #include "brave/components/brave_shields/browser/buildflags/buildflags.h"  // For STP
+#include "build/build_config.h"  // For OS_MACOSX
 #include "chrome/browser/search/search.h"
 #include "content/public/browser/browser_url_handler.h"
 
@@ -23,17 +23,17 @@
 #if defined(OS_LINUX)
 #include "brave/browser/ui/views/brave_browser_main_extra_parts_views_linux.h"
 #define ChromeBrowserMainExtraPartsViewsLinux
-    BraveBrowserMainExtraPartsViewsLinux
+BraveBrowserMainExtraPartsViewsLinux
 #endif
 
 #define HandleNewTabURLRewrite HandleNewTabURLRewrite_ChromiumImpl
 #define HandleNewTabURLReverseRewrite HandleNewTabURLReverseRewrite_ChromiumImpl
 
-namespace search {
-  bool HandleNewTabURLRewrite(GURL* url, content::BrowserContext* bc) {
+    namespace search {
+  bool HandleNewTabURLRewrite(GURL * url, content::BrowserContext * bc) {
     return false;
   }
-  bool HandleNewTabURLReverseRewrite(GURL* url, content::BrowserContext* bc) {
+  bool HandleNewTabURLReverseRewrite(GURL * url, content::BrowserContext * bc) {
     return false;
   }
 }  // namespace search

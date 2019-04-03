@@ -1,4 +1,7 @@
-// Copyright (c) 2019 The Brave Authors. All rights reserved.
+/* Copyright (c) 2019 The Brave Authors. All rights reserved.
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this file,
+ * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 #ifndef BRAVE_BROWSER_RENDERER_HOST_BRAVE_RENDER_MESSAGE_FILTER_H_
 #define BRAVE_BROWSER_RENDERER_HOST_BRAVE_RENDER_MESSAGE_FILTER_H_
@@ -36,9 +39,9 @@ class BraveRenderMessageFilter : public ChromeRenderMessageFilter {
                         bool* allowed);
 
   void IsCookieAccessAllowed(int render_frame_id,
-                        const GURL& origin_url,
-                        const GURL& top_origin_url,
-                        bool* allowed);
+                             const GURL& origin_url,
+                             const GURL& top_origin_url,
+                             bool* allowed);
 
   HostContentSettingsMap* host_content_settings_map_;
   DISALLOW_COPY_AND_ASSIGN(BraveRenderMessageFilter);

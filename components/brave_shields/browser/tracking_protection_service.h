@@ -57,10 +57,11 @@ class TrackingProtectionService : public BaseLocalDataFilesObserver {
                         const GURL& top_origin_url,
                         const GURL& origin_url);
 
-  void SetStartingSiteForRenderFrame(GURL starting_site, int render_process_id,
-    int render_frame_id);
+  void SetStartingSiteForRenderFrame(GURL starting_site,
+                                     int render_process_id,
+                                     int render_frame_id);
   GURL GetStartingSiteForRenderFrame(int render_process_id,
-    int render_frame_id);
+                                     int render_frame_id);
   void DeleteRenderFrameKey(int render_process_id, int render_frame_id);
   void ModifyRenderFrameKey(int old_render_process_id,
                             int old_render_frame_id,

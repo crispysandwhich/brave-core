@@ -694,9 +694,14 @@ BookmarkChangeProcessor::BookmarkNodeToSyncBookmark(
 
   std::string prev_order, next_order, parent_order;
   GetOrder(node->parent(), index, &prev_order, &next_order, &parent_order);
-  if (parent_order.empty() && node->parent()->is_permanent_node())
+  if (parent_order.empty() && node->parent()->is_permanent_node()) {
+    int permanent_parent_index = bookmark_model_->root_node()->
+        GetIndexOf(node->parent());
+    DLOG(INFO) << "permanent_parent_index=" << permanent_parent_index;
     parent_order =
-        sync_prefs_->GetBookmarksBaseOrder() + std::to_string(index);
+        sync_prefs_->GetBookmarksBaseOrder() +
+        std::to_string(permanent_parent_index);
+  }
   bookmark->prevOrder = prev_order;
   bookmark->nextOrder = next_order;
   bookmark->parentOrder = parent_order;

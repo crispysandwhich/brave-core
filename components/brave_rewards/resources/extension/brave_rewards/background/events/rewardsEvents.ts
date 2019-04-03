@@ -70,3 +70,9 @@ chrome.braveRewards.onPublisherListNormalized.addListener((properties: RewardsEx
 chrome.braveRewards.onExcludedSitesChanged.addListener((properties: RewardsExtension.ExcludedSitesChanged) => {
   rewardsPanelActions.onExcludedSitesChanged(properties)
 })
+
+chrome.braveRewards.onRecurringDonations.addListener((donations: Record<string, number>[]) => {
+  rewardsPanelActions.onRecurringDonations({
+    recurringDonations: donations
+  })
+})
